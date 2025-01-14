@@ -9,101 +9,96 @@
 </head>
 <body>
 
-
-
-      <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-          <a class="navbar-brand" href="Home">Melanoma Detection</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-            
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="manage_user">Manage users</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="complaints">Complaints</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="feedback">Feedback</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="">Log Out</a>
-              </li>
-
-          </div>
+            <a class="navbar-brand" href="Home">Melanoma Detection</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="manage_user">Manage users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="complaints">Complaints</a></li>
+                    <li class="nav-item"><a class="nav-link" href="feedback">Feedback</a></li>
+                    <li class="nav-item"><a class="nav-link" href="Logout">Log Out</a></li>
+                </ul>
+            </div>
         </div>
-      </nav>
+    </nav>
 
-
-      <div class="container d-flex justify-content-center mt-5">
-       <h5 class="mb-4 ">User Complaint</h5>
-      </div>
-
-        <div class="container-fluid mt-5 d-flex justify-content-center">
-
-      <table class="table table-primary" style="width: 800px;">
-        <thead>
-          <tr>
-            <th scope="col">Username</th>
-            <th scope="col">Complaint</th>
-            <th scope="col">Date</th>
-            <th scope="col">Reply</th>
-           
-          </tr>
-        </thead>
-        <tbody>
-          {% for i in obj %}
-          <tr>
-            <th scope="row">{{i.USER.name }}</th>
-            <td>{{i.complaints }}</td>
-            <td>{{i.date }}</td>
-            <td>
-              
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@getbootstrap">Reply</button>
-              
-            </td>
-          
-          </tr>
-          {% endfor %}
-
-
-        
-        </tbody>
-      </table>
-
-
-
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">New message</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form method = "post" >
-                {% comment %} <div class="mb-3">
-                  <label for="recipient-name" class="col-form-label">Recipient:</label>
-                  <input type="text" class="form-control" id="recipient-name">
-                </div> {% endcomment %}
-                <div class="mb-3">
-                  <label for="message-text" class="col-form-label">Message:</label>
-                  <textarea class="form-control" id="message-text"></textarea>
-                </div>
-             
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Send message</button>
-            </div>
-          </form>
-          </div>
-        </div>
-      </div>
+    <div class="container d-flex justify-content-center mt-5">
+        <h5 class="mb-4">User Complaint</h5>
     </div>
-    
-</body>
+
+    <div class="container-fluid mt-5 d-flex justify-content-center">
+      <table class="table table-primary" style="width: 800px;">
+          <thead>
+              <tr>
+                  <th scope="col">Username</th>
+                  <th scope="col">Complaint</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Reply</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for i in obj %}
+              <tr>
+                  <th scope="row">{{ i.USER.name }}</th>
+                  <td>{{ i.complaints }}</td>
+                  <td>{{ i.date }}</td>
+                  <td>
+                      <!-- Button to open modal, pass the complaint id -->
+                       {% if i.Reply == "pending" %}
+                      <button type="button" class="btn btn-primary" data-id="{{ i.id }}" onclick="openModel(event)">Reply</button>
+                      {% else %}
+                      <p>{{i.Reply}}</p>
+                      {% endif %}
+                  </td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  </div>
+  
+  <!-- Modal to reply to complaint -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">New message</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <form method="post">
+                      {% csrf_token %}
+                      <!-- Hidden input to store the complaint ID dynamically -->
+                      <div class="mb-3">
+                        
+                          <label for="message-text" class="col-form-label">Message:</label>
+                          <input type="hidden"  class="form-control" id="data-id" name="dataId" value="">
+                          <textarea class="form-control" id="message-text" name="message"></textarea>
+                      </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Send message</button>
+              </div>
+              </form>
+          </div>
+      </div>
+  </div>
+  
+  <script>
+      function openModel(event) {
+          const button = event.target; // Get the clicked button element
+          const dataId = button.getAttribute('data-id'); // Get the 'data-id' attribute from the button
+          document.getElementById('data-id').value = dataId; // Set the value of the hidden input field
+  
+          // Show the modal
+          const replyModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+          replyModal.show();
+      }
+  </script>
+  
+  </body>
 </html>

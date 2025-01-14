@@ -5,6 +5,9 @@ from django.http import HttpResponse
 
 # Create your views here.
 
+class Logout(View):
+    def get(self, request):
+        return render(request, 'administrator/login.html')
 class Login(View):
     def get(self, request):
         return render(request, 'administrator/login.html')
@@ -23,17 +26,29 @@ class Login(View):
             return HttpResponse('''<script>alert("Invalid username or password"),window.location="";</script>''')
 
 
-class complaints(View):
+class ComplaintsView(View):
     def get(self, request):
         obj = Complaints.objects.all()
         return render(request, 'administrator/complaints.html', {'obj': obj})
-    def post(self,request):
-        message = request.POST['message']
-        obj = Complaints.objects.get('id=comp_id')
-        obj.complaints = message
-        obj.save()
-        return HttpResponse('''<script>alert("Complaint updated"),window.location="/complaints";</script>''')
-    
+
+    def post(self, request):
+        message = request.POST.get('message')
+        comp_id = request.POST.get('dataId')
+        
+        if not comp_id:
+            return HttpResponse('Complaint ID is missing.')
+
+        try:
+            comp_id = int(comp_id)  # Ensure the ID is an integer
+            obj = Complaints.objects.get(id=comp_id)
+            obj.Reply = message
+            # Assuming you want to update the complaint with the new message
+            obj.save()
+            return HttpResponse('''<script>alert("Complaint updated"),window.location="/complaints";</script>''')
+        except Complaints.DoesNotExist:
+            return HttpResponse('Complaint not found.')
+        except ValueError:
+            return HttpResponse('Invalid complaint ID.')
     
 class feedback(View):
     def get(self, request):
